@@ -1,11 +1,13 @@
 # NotesReady — Master Task Tracker
 
-## Phase 0: Project Definition & Architecture
+## Phase 0: Project Definition & Architecture — COMPLETE
 - [x] Initial engineering audit and repository assessment
 - [x] Establish official brand "Selected Concept 04" vector assets
+- [x] Complete 4-product reference study (Evernote, Notion, Supernotes, Notejoy)
+- [x] Finalize official brand color system: NotesReady Ember (`#E85D3F`)
 - [x] Create core project documentation (`AGENTS.md`, `README.md`, `prd.md`, `architecture.md`, `design.md`, `rules.md`, `tasks.md`, `decisions.md`, `testing.md`, `memory.md`, `research.md`, `plans.md`)
 
-## Phase 1: Foundation & Application Shell
+## Phase 1: Foundation & Application Shell — APPROVED / COMPLETE WITH REVIEW CORRECTIONS
 - [x] Initialize Next.js 15+ + React 19 + TypeScript app scaffold
 - [x] Configure Tailwind CSS v4 / design tokens with monochrome & slate foundation
 - [x] Integrate official Concept 04 brand vectors (SVG emblem, wordmark, favicon, app icons)
@@ -18,8 +20,9 @@
   - [x] Public marketing landing page (`/`), Privacy (`/privacy`), Terms (`/terms`), and Custom 404 (`/_not-found`)
 - [x] Set up unit test runner (Vitest) and basic shell tests
 - [x] Validate production build (`next build`) and cross-viewport browser rendering
+- [x] Final Phase 1 corrections: Removed native browser alert from New Note button
 
-## Phase 2: Core Workspace & Note Creation
+## Phase 2: Core Workspace & Note Creation — READY TO BEGIN
 - [ ] Note domain models & schemas (Zod)
 - [ ] In-memory / local storage client state with IndexedDB
 - [ ] "New Note" creation flow with immediate title editing

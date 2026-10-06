@@ -9,7 +9,7 @@ A modern, full-featured digital note-taking and knowledge workspace.
 
 ## Brand Identity
 - **Logo**: Selected Concept 04 — Custom geometric 'N' emblem with precision typography.
-- **Palette**: Monochromatic foundation (pure black, pure white, neutral slates). Brand accents will be derived after UI maturation.
+- **Palette**: Neutral slate foundation with official **NotesReady Ember** (`#E85D3F`) accent (supporting: `#C94A30`, `#FCE8E3`, `#FFF5F2`). Concept 04 logo remains strictly monochrome.
 
 ## Technology Stack
 - **Framework**: Next.js 15+ (App Router), React 19, TypeScript
@@ -20,8 +20,8 @@ A modern, full-featured digital note-taking and knowledge workspace.
 
 ## Roadmap
 - [x] **Phase 0**: Project definition, brand identity, architecture audit, core documentation
-- [ ] **Phase 1**: Foundation & application shell
-- [ ] **Phase 2**: Core workspace & note creation
+- [x] **Phase 1**: Foundation & application shell (Approved with review corrections)
+- [ ] **Phase 2**: Core workspace & note creation (Ready to begin)
 - [ ] **Phase 3**: Rich editor
 - [ ] **Phase 4**: Persistence & organization
 - [ ] **Phase 5**: Real-time collaboration

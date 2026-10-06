@@ -66,10 +66,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             variant="primary"
             size="md"
             className="w-full justify-start text-xs font-medium tracking-tight"
-            onClick={() => {
-              // Note creation trigger (Phase 2)
-              alert("Note creation initialized (Phase 2)");
-            }}
+            type="button"
           >
             <Plus size={15} />
             <span>New Note</span>

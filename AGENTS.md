@@ -24,7 +24,7 @@ When requirements conflict, resolve in this strict order:
 ## 3. Brand & Visual Rules
 - **Brand**: NotesReady.
 - **Logo**: Official "Selected Concept 04" (custom geometric 'N' emblem + NotesReady wordmark).
-- **Colors**: Strictly monochrome (black/white) & neutral slate foundation. Final brand accent colors are intentionally undecided until application visual language matures.
+- **Colors**: Neutral slate foundation with official **NotesReady Ember** (`#E85D3F`) accent (supporting: `#C94A30`, `#FCE8E3`, `#FFF5F2`). Target visual ratio: 85–95% neutral, 5–10% accent, 0% decorative gradients. Concept 04 logo remains strictly monochrome black/white.
 - **Aesthetic**: Strictly human-designed. Reject generic AI/SaaS tropes (no neon glowing blobs, no purple/blue gradients, no floating geometric shapes, no excessive glassmorphism).
 
 ## 4. Development Workflow

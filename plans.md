@@ -1,15 +1,20 @@
 # NotesReady — Implementation Plans
 
-## Active Plan: Phase 1 — Project Foundation & Application Shell
-- **Goal**: Establish the Next.js 15+ + TypeScript codebase, design tokens, official Concept 04 brand vectors, and the responsive application shell (sidebar, workspace navigation, search trigger, mobile drawer).
-- **Execution Steps**:
-  1. Initialize core project documentation and Git repository. (Completed)
-  2. Scaffold Next.js + React 19 + TypeScript application structure.
-  3. Create official Concept 04 SVG assets (`logo.svg`, `symbol.svg`, `icon-light.svg`, `icon-dark.svg`, favicon).
-  4. Configure design tokens (monochrome + neutral zinc palette, typography, spacing).
-  5. Implement application shell components:
-     - Header with search trigger & workspace selector
-     - Collapsible sidebar with active navigation states
-     - Mobile navigation drawer
-     - Main content view placeholder
-  6. Add unit tests and verify mobile/desktop responsiveness.
+## Phase 1 — Project Foundation & Application Shell (Complete)
+- **Status**: APPROVED / COMPLETE WITH REVIEW CORRECTIONS
+- **Completed Deliverables**:
+  1. Project source-of-truth documentation framework and Git initialization.
+  2. Next.js 15+ + React 19 + TypeScript application structure.
+  3. Official Concept 04 brand vectors (`logo.svg`, `symbol.svg`, `icon-light.svg`, `icon-dark.svg`, `favicon.svg`).
+  4. Brand color system finalized: NotesReady Ember (`#E85D3F`).
+  5. Application shell components (`AppSidebar`, `AppHeader`, `MobileDrawer`).
+  6. Final review corrections: removed browser alert from New Note button.
+  7. Automated unit testing (Vitest) and static production build verification.
+
+## Upcoming Plan: Phase 2 — Core Workspace & Note Creation (Queued / Ready to Begin)
+- **Status**: QUEUED — DO NOT START UNTIL EXPLICITLY INSTRUCTED
+- **Scope**:
+  - Note domain model & interfaces
+  - Client state management with local persistence (IndexedDB)
+  - "New Note" creation flow with auto-focus title editing
+  - Active note switching, recents, and favorites list
