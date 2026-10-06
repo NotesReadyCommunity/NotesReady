@@ -6,16 +6,18 @@
 - [x] Create core project documentation (`AGENTS.md`, `README.md`, `prd.md`, `architecture.md`, `design.md`, `rules.md`, `tasks.md`, `decisions.md`, `testing.md`, `memory.md`, `research.md`, `plans.md`)
 
 ## Phase 1: Foundation & Application Shell
-- [ ] Initialize Next.js 15+ + React 19 + TypeScript app scaffold
-- [ ] Configure Tailwind CSS v4 / design tokens with monochrome & slate foundation
-- [ ] Integrate official Concept 04 brand vectors (SVG emblem, wordmark, favicon, app icons)
-- [ ] Build responsive application shell:
-  - [ ] Collapsible multi-tier sidebar
-  - [ ] Workspace switcher
-  - [ ] Global search & quick-find trigger (`Ctrl+K`)
-  - [ ] Mobile responsive navigation drawer / sheet
-  - [ ] Active route indicator & note list placeholder
-- [ ] Set up unit test runner (Vitest) and basic shell tests
+- [x] Initialize Next.js 15+ + React 19 + TypeScript app scaffold
+- [x] Configure Tailwind CSS v4 / design tokens with monochrome & slate foundation
+- [x] Integrate official Concept 04 brand vectors (SVG emblem, wordmark, favicon, app icons)
+- [x] Build responsive application shell:
+  - [x] Collapsible multi-tier sidebar
+  - [x] Workspace switcher
+  - [x] Global search & quick-find trigger (`⌘K`)
+  - [x] Mobile responsive navigation drawer / sheet
+  - [x] Active route indicators & sub-route views (`/app`, `/app/notes`, `/app/favorites`, `/app/shared`)
+  - [x] Public marketing landing page (`/`), Privacy (`/privacy`), Terms (`/terms`), and Custom 404 (`/_not-found`)
+- [x] Set up unit test runner (Vitest) and basic shell tests
+- [x] Validate production build (`next build`) and cross-viewport browser rendering
 
 ## Phase 2: Core Workspace & Note Creation
 - [ ] Note domain models & schemas (Zod)
