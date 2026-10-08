@@ -14,7 +14,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-zinc-950 text-white hover:bg-zinc-800 active:bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200",
+        "bg-[var(--brand-ember,#E85D3F)] text-white hover:bg-[var(--brand-ember-dark,#C94A30)] active:bg-[var(--brand-ember-dark,#C94A30)] focus-visible:outline-[var(--brand-ember,#E85D3F)] shadow-xs",
       secondary:
         "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
       outline:

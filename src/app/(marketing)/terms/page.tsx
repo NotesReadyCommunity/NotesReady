@@ -56,8 +56,24 @@ export default function TermsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-[var(--border-subtle)] py-6 text-center text-xs text-[var(--text-muted)]">
-        NotesReady Terms of Service • Draft
+      <footer className="border-t border-[var(--border-subtle)] bg-[var(--surface-0)] py-8 px-6">
+        <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
+          <div className="flex items-center gap-2.5">
+            <BrandLogo size="sm" />
+            <span>© {new Date().getFullYear()} NotesReady Inc.</span>
+          </div>
+          <div className="flex items-center gap-4 text-[var(--text-secondary)]">
+            <Link href="/" className="hover:text-[var(--text-primary)] transition-colors">
+              Home
+            </Link>
+            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/app" className="hover:text-[var(--text-primary)] transition-colors">
+              Workspace
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

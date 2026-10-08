@@ -180,21 +180,83 @@ export default function MarketingPage() {
         </section>
       </main>
 
-      {/* Clean Footer */}
-      <footer className="border-t border-[var(--border-subtle)] bg-[var(--surface-0)] py-8 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
-          <div className="flex items-center gap-3">
-            <BrandLogo size="sm" />
-            <span>© {new Date().getFullYear()} NotesReady Inc. All rights reserved.</span>
+      {/* Structured Editorial Footer */}
+      <footer className="border-t border-[var(--border-subtle)] bg-[var(--surface-0)] pt-14 pb-12 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto space-y-10">
+          {/* Top: Brand Area & Structured Navigation */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+            {/* Brand Column */}
+            <div className="md:col-span-6 space-y-3">
+              <Link href="/" className="inline-flex">
+                <BrandLogo size="md" />
+              </Link>
+              <p className="text-xs text-[var(--text-secondary)] max-w-sm leading-relaxed">
+                A calm, powerful workspace for everything you think and create. Fast, distraction-free digital knowledge architecture.
+              </p>
+            </div>
+
+            {/* Product & Workspace Links (Real, existing routes only) */}
+            <div className="md:col-span-3 space-y-3">
+              <h4 className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider">
+                Product
+              </h4>
+              <ul className="space-y-2 text-xs text-[var(--text-secondary)]">
+                <li>
+                  <Link href="/app" className="hover:text-[var(--text-primary)] transition-colors">
+                    Open Workspace
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/app/notes" className="hover:text-[var(--text-primary)] transition-colors">
+                    Notes Directory
+                  </Link>
+                </li>
+                <li>
+                  <a href="#features" className="hover:text-[var(--text-primary)] transition-colors">
+                    Core Capabilities
+                  </a>
+                </li>
+                <li>
+                  <a href="#workspace" className="hover:text-[var(--text-primary)] transition-colors">
+                    Canvas Preview
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal & Trust Links */}
+            <div className="md:col-span-3 space-y-3">
+              <h4 className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider">
+                Trust & Legal
+              </h4>
+              <ul className="space-y-2 text-xs text-[var(--text-secondary)]">
+                <li>
+                  <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <a href="#security" className="hover:text-[var(--text-primary)] transition-colors">
+                    Security Principles
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors">
-              Terms of Service
-            </Link>
+          {/* Bottom Copyright & Status Bar */}
+          <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--text-muted)]">
+            <span>
+              © {new Date().getFullYear()} NotesReady Inc. All rights reserved.
+            </span>
+            <span className="font-mono text-[11px] text-[var(--text-muted)]">
+              notesready.in • Independent Knowledge Canvas
+            </span>
           </div>
         </div>
       </footer>
