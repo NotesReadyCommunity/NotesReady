@@ -60,9 +60,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </Link>
           <button
             type="button"
-            className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-            title="Workspace Options"
-            aria-label="Workspace Options"
+            disabled
+            aria-disabled="true"
+            className="p-1.5 rounded-md text-[var(--text-muted)] opacity-50 cursor-not-allowed"
+            title="Workspace options (planned)"
+            aria-label="Workspace Options (planned)"
           >
             <ChevronDown size={16} />
           </button>
@@ -81,21 +83,20 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             <span>New Note</span>
           </Button>
 
-          <Link href="/app/notes" onClick={onCloseMobile} className="block w-full">
-            <div
-              role="button"
-              tabIndex={0}
-              className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-0)] text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Search size={14} />
-                <span>Quick Search...</span>
-              </div>
-              <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-secondary)] font-mono border border-[var(--border-subtle)]">
-                ⌘K
-              </kbd>
+          {/* Quick Search (Planned Feature) */}
+          <div
+            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-0)]/60 text-xs text-[var(--text-muted)] opacity-60 cursor-not-allowed select-none"
+            aria-disabled="true"
+            title="Quick search is planned for a future release"
+          >
+            <div className="flex items-center gap-2">
+              <Search size={14} className="shrink-0" />
+              <span>Quick Search</span>
             </div>
-          </Link>
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-muted)] uppercase tracking-wider font-mono">
+              Soon
+            </span>
+          </div>
         </div>
 
         {/* Main Navigation */}
@@ -157,57 +158,58 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
         </div>
 
-        {/* Notebooks Section Placeholder */}
+        {/* Notebooks Section (Planned Feature) */}
         <div className="mt-5 px-3">
           <div className="flex items-center justify-between px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
             <span>Notebooks</span>
-            <button
-              type="button"
-              className="hover:text-[var(--text-primary)] p-0.5 cursor-pointer"
-              title="Add Notebook"
-              aria-label="Add Notebook"
-            >
-              <Plus size={13} />
-            </button>
           </div>
 
           <div className="mt-1 space-y-0.5">
-            <Link href="/app/notes" onClick={onCloseMobile} className="block w-full">
-              <div
-                role="button"
-                tabIndex={0}
-                className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer text-left"
-              >
-                <FolderClosed size={15} className="shrink-0 text-[var(--text-muted)]" />
-                <span className="truncate">General Knowledge</span>
+            <div
+              className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-[var(--text-muted)] opacity-60 cursor-not-allowed select-none"
+              aria-disabled="true"
+              title="Notebook organization is planned for a future release"
+            >
+              <div className="flex items-center gap-2 truncate">
+                <FolderClosed size={14} className="shrink-0" />
+                <span className="truncate">Notebooks</span>
               </div>
-            </Link>
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-muted)] uppercase tracking-wider font-mono">
+                Soon
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Footer Section */}
+      {/* Bottom Footer Section (Planned Features) */}
       <div className="p-3 border-t border-[var(--border-subtle)] space-y-1">
-        <Link href="/app" onClick={onCloseMobile} className="block w-full">
-          <div
-            role="button"
-            tabIndex={0}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
-          >
-            <Settings size={15} />
+        <div
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-[var(--text-muted)] opacity-60 cursor-not-allowed select-none"
+          aria-disabled="true"
+          title="Settings are planned for a future release"
+        >
+          <div className="flex items-center gap-2.5">
+            <Settings size={15} className="shrink-0" />
             <span>Settings</span>
           </div>
-        </Link>
-        <Link href="/app/notes" onClick={onCloseMobile} className="block w-full">
-          <div
-            role="button"
-            tabIndex={0}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
-          >
-            <Trash2 size={15} />
+          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-muted)] uppercase tracking-wider font-mono">
+            Soon
+          </span>
+        </div>
+        <div
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-[var(--text-muted)] opacity-60 cursor-not-allowed select-none"
+          aria-disabled="true"
+          title="Trash is planned for a future release"
+        >
+          <div className="flex items-center gap-2.5">
+            <Trash2 size={15} className="shrink-0" />
             <span>Trash</span>
           </div>
-        </Link>
+          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-muted)] uppercase tracking-wider font-mono">
+            Soon
+          </span>
+        </div>
       </div>
     </aside>
   );
