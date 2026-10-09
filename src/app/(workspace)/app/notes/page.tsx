@@ -1,66 +1,89 @@
+"use client";
+
 import React from "react";
-import { FileText, Plus } from "lucide-react";
+import Link from "next/link";
+import { FileText, Plus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useWorkspace } from "@/context/WorkspaceContext";
 
 export default function AllNotesPage() {
-  const sampleNotes = [
-    {
-      id: "note-1",
-      title: "Welcome to NotesReady",
-      excerpt: "NotesReady is your modern workspace for capturing ideas, structuring knowledge...",
-      date: "2 mins ago",
-      notebook: "General Knowledge",
-    },
-    {
-      id: "note-2",
-      title: "System Architecture & Sync Engine",
-      excerpt: "Technical specifications on Yjs CRDT synchronization and Hocuspocus WebSocket layer...",
-      date: "Yesterday",
-      notebook: "Product Engineering",
-    },
-  ];
+  const { notes, isLoading, createNote } = useWorkspace();
 
   return (
-    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-6">
+    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-6 select-none">
       <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
             All Notes
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            2 notes in current workspace
+            {isLoading ? "Loading notes..." : `${notes.length} note${notes.length === 1 ? "" : "s"} in local workspace`}
           </p>
         </div>
-        <Button variant="primary" size="sm" className="text-xs">
+        <Button variant="primary" size="sm" className="text-xs" onClick={() => createNote()}>
           <Plus size={14} />
           <span>New Note</span>
         </Button>
       </div>
 
-      <div className="space-y-2">
-        {sampleNotes.map((note) => (
-          <div
-            key={note.id}
-            className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-0)] hover:bg-[var(--surface-1)] transition-all cursor-pointer group space-y-1.5"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-black dark:group-hover:text-white">
-                {note.title}
-              </h2>
-              <span className="text-[11px] text-[var(--text-muted)] font-mono">
-                {note.date}
-              </span>
-            </div>
-            <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
-              {note.excerpt}
-            </p>
-            <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)] pt-1">
-              <FileText size={11} />
-              <span>{note.notebook}</span>
-            </div>
+      {isLoading ? (
+        <div className="space-y-3 animate-pulse">
+          <div className="h-20 bg-[var(--surface-1)] rounded-xl" />
+          <div className="h-20 bg-[var(--surface-1)] rounded-xl" />
+        </div>
+      ) : notes.length === 0 ? (
+        <div className="p-12 text-center border border-dashed border-[var(--border-strong)] rounded-2xl space-y-3">
+          <div className="w-10 h-10 mx-auto rounded-xl bg-[var(--surface-2)] flex items-center justify-center text-[var(--text-muted)]">
+            <FileText size={20} />
           </div>
-        ))}
-      </div>
+          <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+            No notes yet
+          </h2>
+          <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto">
+            Your thoughts and knowledge will appear here. Click New Note to begin writing immediately.
+          </p>
+          <div className="pt-2">
+            <Button variant="primary" size="sm" onClick={() => createNote()}>
+              <Plus size={13} />
+              <span>Create First Note</span>
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {notes.map((note) => {
+            const formattedDate = new Date(note.updatedAt).toLocaleDateString([], {
+              month: "short",
+              day: "numeric",
+            });
+
+            return (
+              <Link
+                key={note.id}
+                href={`/app/notes/${note.id}`}
+                className="block p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-0)] hover:bg-[var(--surface-1)] transition-all cursor-pointer group space-y-1.5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-black dark:group-hover:text-white">
+                      {note.title || "Untitled note"}
+                    </h2>
+                    {note.isFavorite && (
+                      <Star size={12} className="text-[var(--brand-ember,#E85D3F)]" fill="currentColor" />
+                    )}
+                  </div>
+                  <span className="text-[11px] text-[var(--text-muted)] font-mono">
+                    {formattedDate}
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
+                  {note.content.trim() || "Empty note"}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -21,12 +21,21 @@
 - [x] Set up unit test runner (Vitest) and basic shell tests
 - [x] Validate production build (`next build`) and cross-viewport browser rendering
 - [x] Final Phase 1 corrections: Removed native browser alert from New Note button
+- [x] Phase 1 recovery corrections: Concept 04 Latin 'N' vector geometry rectified, Ember CSS tokens integrated, primary CTA/New Note updated, and marketing/legal footers restructured
 
-## Phase 2: Core Workspace & Note Creation — READY TO BEGIN
-- [ ] Note domain models & schemas (Zod)
-- [ ] In-memory / local storage client state with IndexedDB
-- [ ] "New Note" creation flow with immediate title editing
-- [ ] Recent notes and Favorites list
+## Phase 2: Core Workspace & Note Creation — IMPLEMENTED / PENDING OWNER APPROVAL
+- [x] Note domain models & schemas (TypeScript runtime validation)
+- [x] Local-first client state with zero-dependency IndexedDB adapter (`notesready-db`)
+- [x] Storage honesty: browser detects IndexedDB unavailability without silent RAM masquerading
+- [x] Transaction durability: `saveNote` and `hardDeleteNote` resolve on `tx.oncomplete` and reject on error/abort
+- [x] Reset cached rejected `dbPromise` on error to allow retries
+- [x] "New Note" creation flow with immediate title editing and auto-focus
+- [x] Title Enter key navigation: Enter in title input seamlessly focuses content textarea
+- [x] Safe note deletion: inline confirmation protection ("Move to trash?", "Cancel", "Move to Trash")
+- [x] Header route & status synchronization: contextually reflects "Workspace", "All Notes", "Favorites", or note title; hides note save indicator on overview routes
+- [x] Recent notes limit (`repo.listRecentNotes(6)`) and in-memory reactive updates to prevent unnecessary full-workspace re-queries on autosave
+- [x] Debounced autosave (400ms) with honest local save status
+- [x] Soft-deletion support and missing note error handling
 
 ## Phase 3: Rich Editor
 - [ ] Tiptap modular editor integration

@@ -14,9 +14,11 @@ import {
   Trash2,
   FolderClosed,
   ChevronDown,
+  Clock,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/ui/button";
+import { useWorkspace } from "@/context/WorkspaceContext";
 
 interface AppSidebarProps {
   className?: string;
@@ -28,6 +30,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onCloseMobile,
 }) => {
   const pathname = usePathname();
+  const { recentNotes, createNote } = useWorkspace();
 
   const navItems = [
     { label: "Home", href: "/app", icon: Home },
@@ -36,12 +39,17 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     { label: "Shared", href: "/app/shared", icon: Users },
   ];
 
+  const handleNewNoteClick = async () => {
+    await createNote();
+    onCloseMobile?.();
+  };
+
   return (
     <aside
       className={`w-64 border-r border-[var(--border-subtle)] bg-[var(--surface-1)] flex flex-col justify-between h-full select-none ${className}`}
     >
       {/* Top Header & Workspace Switcher */}
-      <div>
+      <div className="flex-1 overflow-y-auto">
         <div className="p-4 flex items-center justify-between border-b border-[var(--border-subtle)]">
           <Link
             href="/app"
@@ -67,6 +75,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             size="md"
             className="w-full justify-start text-xs font-medium tracking-tight"
             type="button"
+            onClick={handleNewNoteClick}
           >
             <Plus size={15} />
             <span>New Note</span>
@@ -110,7 +119,42 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           })}
         </nav>
 
-        {/* Notebooks / Folders Section Placeholder */}
+        {/* Real Recent Notes Section */}
+        <div className="mt-5 px-3">
+          <div className="flex items-center justify-between px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+            <span>Recent Notes</span>
+            <Clock size={12} />
+          </div>
+
+          <div className="mt-1 space-y-0.5">
+            {recentNotes.length === 0 ? (
+              <p className="px-3 py-2 text-[11px] text-[var(--text-muted)] italic">
+                No notes created yet.
+              </p>
+            ) : (
+              recentNotes.map((note) => {
+                const isCurrent = pathname === `/app/notes/${note.id}`;
+                return (
+                  <Link
+                    key={note.id}
+                    href={`/app/notes/${note.id}`}
+                    onClick={onCloseMobile}
+                    className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer truncate ${
+                      isCurrent
+                        ? "bg-[var(--surface-2)] text-[var(--text-primary)] font-medium"
+                        : "text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
+                    }`}
+                  >
+                    <FileText size={13} className="shrink-0 text-[var(--text-muted)]" />
+                    <span className="truncate">{note.title || "Untitled note"}</span>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Notebooks Section Placeholder */}
         <div className="mt-5 px-3">
           <div className="flex items-center justify-between px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
             <span>Notebooks</span>
@@ -131,13 +175,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             >
               <FolderClosed size={15} className="shrink-0 text-[var(--text-muted)]" />
               <span className="truncate">General Knowledge</span>
-            </button>
-            <button
-              type="button"
-              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer text-left"
-            >
-              <FolderClosed size={15} className="shrink-0 text-[var(--text-muted)]" />
-              <span className="truncate">Product Engineering</span>
             </button>
           </div>
         </div>

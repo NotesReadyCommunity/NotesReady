@@ -46,3 +46,14 @@
   3. **Primary CTA Treatment**: Updated the `Button` primary variant to use NotesReady Ember with high-contrast text and Ember Dark hover states. The "New Note" action visually receives this primary treatment while remaining a clean placeholder.
   4. **Editorial Footer Structure**: Restructured marketing and legal footers into a mature, restrained layout respecting logo clearspace, product tagline, and linking strictly to verified existing routes.
   5. **Logo Scale Standardization**: Standardized `BrandLogo` sizes to `sm` (24px), `md` (32px), and `lg` (48px) aligned with the tested brand matrix.
+
+## ADR-008: Local-First IndexedDB Persistence & Core Note Architecture
+- **Status**: Accepted (Implemented with Phase 2 Fixes)
+- **Context**: Phase 2 requires transforming the workspace shell into an authentic single-user note-taking canvas without introducing premature server or rich-text editor dependencies.
+- **Decision**:
+  1. **Platform-Agnostic Core**: Created a decoupled `Note` domain entity and `NoteRepository` interface in `src/core/models/` and `src/core/storage/`, remaining free of React framework lock-in.
+  2. **Native IndexedDB Adapter with Storage Honesty**: Implemented zero-dependency `IndexedDBNoteRepository` (`notesready-db`). In browser environments, durable storage availability is strictly verified: if IndexedDB is missing or fails, the application explicitly surfaces a "Storage unavailable" warning rather than silently masquerading in-memory storage as durable. `MemoryNoteRepository` is strictly reserved for SSR, Node, and isolated unit tests.
+  3. **Transaction Durability**: IndexedDB `saveNote` and `hardDeleteNote` promises resolve strictly upon `tx.oncomplete` (ACID transaction commit) rather than individual request success, and reject on `tx.onerror` / `tx.onabort`. Cached rejected DB connection promises are reset on failure to allow subsequent retries.
+  4. **Distraction-Free Canvas & Accessible Navigation**: Implemented a content-first writing surface in `NoteEditor.tsx` with title auto-focus on fresh notes, auto-resizing content textarea, and Enter key navigation from title input to content textarea.
+  5. **Honest Debounced Save Lifecycle & Efficient State Sync**: Configured a 400ms debounce interval with transparent local save status indicators (`Saved locally`, `Saving locally...`, `Unsaved changes`, `Storage error`). Keystroke autosaves update local and workspace in-memory state directly, avoiding redundant full database re-scans.
+  6. **Route-Synchronized Header & Safe Deletion**: `AppHeader` contextually synchronizes with the active route ("Workspace", "All Notes", "Favorites", or the current note title), displaying save status only when an active note is being edited. Destructive note actions are protected with an accessible, keyboard-navigable inline confirmation ("Move to trash?", "Cancel", "Move to Trash").
