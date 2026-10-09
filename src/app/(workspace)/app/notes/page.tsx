@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FileText, Plus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { getNoteSnippet } from "@/core/utils/content";
 
 export default function AllNotesPage() {
   const { notes, isLoading, createNote } = useWorkspace();
@@ -77,7 +78,7 @@ export default function AllNotesPage() {
                   </span>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
-                  {note.content.trim() || "Empty note"}
+                  {getNoteSnippet(note.content, note.format)}
                 </p>
               </Link>
             );

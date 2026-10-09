@@ -10,7 +10,7 @@ import { MobileDrawer } from "@/components/layout/MobileDrawer";
 function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { currentNoteTitle, saveStatus, isStorageDurable, storageError } = useWorkspace();
+  const { currentNoteTitle, saveStatus, isStorageDurable, storageError, retrySave } = useWorkspace();
 
   // Determine contextual header title and save status relevance (P1 Fix #5)
   const isEditingNote = pathname.startsWith("/app/notes/") && pathname !== "/app/notes";
@@ -46,6 +46,7 @@ function WorkspaceShell({ children }: { children: React.ReactNode }) {
           showSaveStatus={isEditingNote}
           isStorageDurable={isStorageDurable}
           storageError={storageError}
+          onRetrySave={retrySave}
         />
         <main className="flex-1 overflow-y-auto bg-[var(--surface-0)] p-4 sm:p-8">
           {children}

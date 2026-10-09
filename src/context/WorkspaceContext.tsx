@@ -17,6 +17,8 @@ interface WorkspaceContextValue {
   currentNoteTitle: string;
   isStorageDurable: boolean;
   storageError: string | null;
+  retrySave?: () => Promise<void>;
+  setRetrySaveHandler: (fn: (() => Promise<void>) | null) => void;
   createNote: () => Promise<Note>;
   deleteNote: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
@@ -39,6 +41,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [currentNoteTitle, setCurrentNoteTitle] = useState("Workspace");
   const [isStorageDurable, setIsStorageDurable] = useState(true);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [retryHandler, setRetryHandler] = useState<(() => Promise<void>) | null>(null);
 
   const refreshNotes = useCallback(async () => {
     try {
@@ -148,6 +151,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         currentNoteTitle,
         isStorageDurable,
         storageError,
+        retrySave: retryHandler ?? undefined,
+        setRetrySaveHandler: setRetryHandler,
         createNote,
         deleteNote,
         toggleFavorite,

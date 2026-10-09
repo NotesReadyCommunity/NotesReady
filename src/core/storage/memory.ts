@@ -3,7 +3,7 @@ import { NoteRepository } from "./types";
 import { isNote } from "../validation/note";
 
 export class MemoryNoteRepository implements NoteRepository {
-  readonly isDurable = false;
+  readonly isDurable: boolean = false;
   private notes: Map<string, Note> = new Map();
 
 

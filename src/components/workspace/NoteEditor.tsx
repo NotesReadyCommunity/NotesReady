@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useNote } from "@/hooks/useNote";
 import { useWorkspace } from "@/context/WorkspaceContext";
 import { Button } from "@/components/ui/button";
+import { RichEditor, RichEditorRef } from "@/components/editor/RichEditor";
+import { EditorErrorBoundary } from "@/components/editor/EditorErrorBoundary";
 
 interface NoteEditorProps {
   noteId: string;
@@ -16,6 +18,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
     note,
     title,
     content,
+    format,
     isLoading,
     isNotFound,
     handleTitleChange,
@@ -25,17 +28,9 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
   } = useNote(noteId);
 
   const { createNote } = useWorkspace();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const richEditorRef = useRef<RichEditorRef>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  // Auto-resize content textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.max(300, textareaRef.current.scrollHeight)}px`;
-    }
-  }, [content]);
 
   // Auto-focus title if note is fresh (content empty and title default)
   useEffect(() => {
@@ -45,11 +40,11 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
     }
   }, [isLoading, note]);
 
-  // P1 Fix #3: Enter key in title moves focus to content textarea
+  // Pressing Enter in title focuses the rich editor canvas immediately
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      textareaRef.current?.focus();
+      richEditorRef.current?.focus();
     }
   };
 
@@ -126,7 +121,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
             <Star size={16} fill={note.isFavorite ? "currentColor" : "none"} />
           </button>
 
-          {/* P1 Fix #4: Accidental deletion protection */}
+          {/* Accidental deletion protection */}
           {showDeleteConfirm ? (
             <div
               className="flex items-center gap-1.5 bg-[var(--surface-2)] px-2 py-0.5 rounded-lg border border-[var(--border-subtle)] text-xs animate-in fade-in"
@@ -179,19 +174,22 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
         />
       </div>
 
-      {/* Note Content Textarea (Deliberately simple, distraction-free writing surface) */}
-      <div>
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => handleContentChange(e.target.value)}
-          placeholder="Start writing immediately..."
-          aria-label="Note Content"
-          className="w-full bg-transparent outline-none border-none p-0 focus:ring-0 text-base sm:text-lg leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none font-sans"
-          rows={12}
-        />
+      {/* Note Content (Rich Editor with Error Boundary fallback) */}
+      <div className="pt-2">
+        <EditorErrorBoundary
+          fallbackContent={content}
+          format={format}
+          onContentChange={handleContentChange}
+        >
+          <RichEditor
+            key={note.id}
+            ref={richEditorRef}
+            content={content}
+            format={format}
+            onContentChange={handleContentChange}
+          />
+        </EditorErrorBoundary>
       </div>
     </article>
   );
 };
-

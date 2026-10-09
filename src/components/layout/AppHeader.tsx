@@ -12,6 +12,7 @@ interface AppHeaderProps {
   showSaveStatus?: boolean;
   isStorageDurable?: boolean;
   storageError?: string | null;
+  onRetrySave?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -21,6 +22,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   showSaveStatus = true,
   isStorageDurable = true,
   storageError = null,
+  onRetrySave,
 }) => {
   return (
     <header className="h-14 border-b border-[var(--border-subtle)] bg-[var(--surface-0)] px-4 flex items-center justify-between select-none">
@@ -75,10 +77,20 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </>
               )}
               {saveStatus === "error" && (
-                <>
-                  <AlertCircle size={12} className="text-red-500" />
-                  <span className="text-red-500">Storage error</span>
-                </>
+                <div className="flex items-center gap-1.5 text-red-500">
+                  <AlertCircle size={12} />
+                  <span>Could not save</span>
+                  {onRetrySave && (
+                    <button
+                      type="button"
+                      onClick={onRetrySave}
+                      className="ml-1 px-1.5 py-0.5 rounded bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-medium text-[10px] cursor-pointer"
+                      aria-label="Retry saving note"
+                    >
+                      Retry
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}

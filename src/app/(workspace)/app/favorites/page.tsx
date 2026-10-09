@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { getNoteSnippet } from "@/core/utils/content";
 
 export default function FavoritesPage() {
   const { favoriteNotes, isLoading } = useWorkspace();
@@ -63,7 +64,7 @@ export default function FavoritesPage() {
                   </span>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
-                  {note.content.trim() || "Empty note"}
+                  {getNoteSnippet(note.content, note.format)}
                 </p>
               </Link>
             );
