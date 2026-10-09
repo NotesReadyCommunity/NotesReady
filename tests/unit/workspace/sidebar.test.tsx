@@ -6,6 +6,7 @@ import { WorkspaceProvider } from "@/context/WorkspaceContext";
 import { MemoryNoteRepository } from "@/core/storage/memory";
 import { setNoteRepository } from "@/core/storage";
 import { createEmptyNote } from "@/core/models/note";
+import { createEmptyNotebook } from "@/core/models/notebook";
 
 // Mock router and navigation
 vi.mock("next/navigation", () => ({
@@ -53,8 +54,14 @@ describe("AppSidebar Navigation Integrity", () => {
     const favoritesLink = screen.getByRole("link", { name: /favorites/i });
     expect(favoritesLink.getAttribute("href")).toBe("/app/favorites");
 
+    const archiveLink = screen.getByRole("link", { name: /archive/i });
+    expect(archiveLink.getAttribute("href")).toBe("/app/archive");
+
     const sharedLink = screen.getByRole("link", { name: /shared/i });
     expect(sharedLink.getAttribute("href")).toBe("/app/shared");
+
+    const trashLink = screen.getByRole("link", { name: /trash/i });
+    expect(trashLink.getAttribute("href")).toBe("/app/trash");
 
     // Brand logo link to /app
     const logoLink = screen.getByRole("link", { name: /notesready/i });
@@ -97,6 +104,22 @@ describe("AppSidebar Navigation Integrity", () => {
     expect(designLink.getAttribute("href")).toBe(`/app/notes/${note2.id}`);
   });
 
+  it("renders dynamic notebooks and links them to notebook detail pages", async () => {
+    const repo = new MemoryNoteRepository();
+    const nb1 = createEmptyNotebook("Engineering Docs");
+    await repo.saveNotebook(nb1);
+    setNoteRepository(repo);
+
+    render(
+      <WorkspaceProvider>
+        <AppSidebar />
+      </WorkspaceProvider>
+    );
+
+    const nbLink = await screen.findByRole("link", { name: /engineering docs/i });
+    expect(nbLink.getAttribute("href")).toBe(`/app/notebooks/${nb1.id}`);
+  });
+
   it("does not route Quick Search to generic pages and presents it as an unavailable/planned feature", async () => {
     await renderSidebar();
 
@@ -110,24 +133,6 @@ describe("AppSidebar Navigation Integrity", () => {
     expect(within(quickSearchContainer as HTMLElement).getByText(/soon/i)).toBeDefined();
   });
 
-  it("does not route Notebooks to generic pages and presents it as an unavailable/planned feature without fake notebook links", async () => {
-    await renderSidebar();
-
-    // No fake "General Knowledge" notebook pretending to exist
-    expect(screen.queryByText("General Knowledge")).toBeNull();
-
-    // Notebooks section item must NOT be a link to /app/notes or /app
-    const notebooksItems = screen.getAllByText("Notebooks");
-    // Find the item with aria-disabled
-    const disabledNotebookItem = notebooksItems
-      .map((el) => el.closest("[aria-disabled='true']"))
-      .find((el) => el !== null);
-
-    expect(disabledNotebookItem).not.toBeNull();
-    expect(disabledNotebookItem?.closest("a")).toBeNull();
-    expect(within(disabledNotebookItem as HTMLElement).getByText(/soon/i)).toBeDefined();
-  });
-
   it("does not route Settings to workspace home and presents it as an unavailable/planned feature", async () => {
     await renderSidebar();
 
@@ -139,15 +144,21 @@ describe("AppSidebar Navigation Integrity", () => {
     expect(within(settingsContainer as HTMLElement).getByText(/soon/i)).toBeDefined();
   });
 
-  it("does not route Trash to All Notes and presents it as an unavailable/planned feature", async () => {
-    await renderSidebar();
+  it("links Trash directly to /app/trash with badge count when notes are trashed", async () => {
+    const repo = new MemoryNoteRepository();
+    const trashedNote = createEmptyNote({ title: "Draft to discard", deletedAt: new Date().toISOString() });
+    await repo.saveNote(trashedNote);
+    setNoteRepository(repo);
 
-    // Trash must NOT be a link to /app/notes
-    const trashText = screen.getByText("Trash");
-    const trashContainer = trashText.closest("[aria-disabled='true']");
-    expect(trashContainer).not.toBeNull();
-    expect(trashContainer?.closest("a")).toBeNull();
-    expect(within(trashContainer as HTMLElement).getByText(/soon/i)).toBeDefined();
+    render(
+      <WorkspaceProvider>
+        <AppSidebar />
+      </WorkspaceProvider>
+    );
+
+    const trashLink = await screen.findByRole("link", { name: /trash/i });
+    expect(trashLink.getAttribute("href")).toBe("/app/trash");
+    expect(within(trashLink).getByText("1")).toBeDefined();
   });
 
   it("ensures no interactive elements are nested inside links", async () => {

@@ -20,10 +20,10 @@ A modern, full-featured digital note-taking and knowledge workspace.
 
 ## Roadmap
 - [x] **Phase 0**: Project definition, brand identity, architecture audit, core documentation
-- [x] **Phase 1**: Foundation & application shell (Approved with review corrections)
-- [ ] **Phase 2**: Core workspace & note creation (Ready to begin)
-- [ ] **Phase 3**: Rich editor
-- [ ] **Phase 4**: Persistence & organization
+- [x] **Phase 1**: Foundation & application shell
+- [x] **Phase 2**: Core workspace & note creation
+- [x] **Phase 3**: Rich editor
+- [x] **Phase 4**: Persistence & organization
 - [ ] **Phase 5**: Real-time collaboration
 - [ ] **Phase 6**: Sharing & permissions
 - [ ] **Phase 7**: Search & retrieval
