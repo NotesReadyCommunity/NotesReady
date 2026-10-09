@@ -11,7 +11,7 @@ export default function AllNotesPage() {
   const { notes, isLoading, createNote } = useWorkspace();
 
   return (
-    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-6 select-none">
+    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-6">
       <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">

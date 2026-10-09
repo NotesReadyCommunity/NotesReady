@@ -81,18 +81,21 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             <span>New Note</span>
           </Button>
 
-          <button
-            type="button"
-            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-0)] text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <Search size={14} />
-              <span>Quick Search...</span>
+          <Link href="/app/notes" onClick={onCloseMobile} className="block w-full">
+            <div
+              role="button"
+              tabIndex={0}
+              className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-0)] text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Search size={14} />
+                <span>Quick Search...</span>
+              </div>
+              <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-secondary)] font-mono border border-[var(--border-subtle)]">
+                ⌘K
+              </kbd>
             </div>
-            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--text-secondary)] font-mono border border-[var(--border-subtle)]">
-              ⌘K
-            </kbd>
-          </button>
+          </Link>
         </div>
 
         {/* Main Navigation */}
@@ -169,33 +172,42 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
 
           <div className="mt-1 space-y-0.5">
-            <button
-              type="button"
-              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer text-left"
-            >
-              <FolderClosed size={15} className="shrink-0 text-[var(--text-muted)]" />
-              <span className="truncate">General Knowledge</span>
-            </button>
+            <Link href="/app/notes" onClick={onCloseMobile} className="block w-full">
+              <div
+                role="button"
+                tabIndex={0}
+                className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer text-left"
+              >
+                <FolderClosed size={15} className="shrink-0 text-[var(--text-muted)]" />
+                <span className="truncate">General Knowledge</span>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
 
       {/* Bottom Footer Section */}
       <div className="p-3 border-t border-[var(--border-subtle)] space-y-1">
-        <button
-          type="button"
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
-        >
-          <Settings size={15} />
-          <span>Settings</span>
-        </button>
-        <button
-          type="button"
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
-        >
-          <Trash2 size={15} />
-          <span>Trash</span>
-        </button>
+        <Link href="/app" onClick={onCloseMobile} className="block w-full">
+          <div
+            role="button"
+            tabIndex={0}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
+          >
+            <Settings size={15} />
+            <span>Settings</span>
+          </div>
+        </Link>
+        <Link href="/app/notes" onClick={onCloseMobile} className="block w-full">
+          <div
+            role="button"
+            tabIndex={0}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
+          >
+            <Trash2 size={15} />
+            <span>Trash</span>
+          </div>
+        </Link>
       </div>
     </aside>
   );

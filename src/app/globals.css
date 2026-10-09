@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-ember: #E85D3F;
+  --color-brand-ember-dark: #C94A30;
+  --color-brand-ember-light: #FCE8E3;
+  --color-brand-ember-pale: #FFF5F2;
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+}
+
 :root {
   --background: #ffffff;
   --foreground: #18181b;

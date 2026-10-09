@@ -10,7 +10,7 @@ export default function FavoritesPage() {
   const { favoriteNotes, isLoading } = useWorkspace();
 
   return (
-    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-6 select-none">
+    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-6">
       <div className="pb-4 border-b border-[var(--border-subtle)]">
         <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
           Favorites

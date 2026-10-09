@@ -11,7 +11,7 @@ export default function WorkspaceHomePage() {
   const latestNote = notes[0];
 
   return (
-    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-8 select-none">
+    <div className="max-w-3xl mx-auto py-4 sm:py-8 space-y-8">
       {/* Note Header / Document Meta */}
       <div className="space-y-4">
         <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
@@ -61,7 +61,7 @@ export default function WorkspaceHomePage() {
         )}
 
         <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] pt-4 border-t border-[var(--border-subtle)]">
-          Phase 2 Core Workspace Capabilities
+          Core Workspace Capabilities
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
