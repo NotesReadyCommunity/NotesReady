@@ -35,20 +35,29 @@ export function useNote(id: string) {
   const saveSeqRef = useRef<number>(0);
   const activeIdRef = useRef<string>(id);
 
+  // In-flight save tracking and committed snapshot tracking to prevent stale saves
+  // and ensure in-progress saves during lifecycle unmount/pagehide are properly sequenced.
+  const inFlightPromiseRef = useRef<Promise<void> | null>(null);
+  const lastCommittedRef = useRef<{ title: string; content: string; format: NoteContentFormat } | null>(null);
+
   latestDataRef.current = { title, content, format };
   noteRef.current = note;
   activeIdRef.current = id;
 
   // Stable save function with sequence counter to prevent stale asynchronous overwrites
   const performSave = useCallback(
-    async (currentTitle: string, currentContent: string, currentFormat: NoteContentFormat) => {
+    async (
+      currentTitle: string,
+      currentContent: string,
+      currentFormat: NoteContentFormat
+    ): Promise<void> => {
       const base = noteRef.current;
       const targetId = activeIdRef.current;
       if (!base || base.id !== targetId) return;
 
       // Check document hard size limit before saving
       const totalBytes = getContentSizeBytes(currentContent);
-      if (totalBytes >= HARD_SIZE_LIMIT_BYTES) {
+      if (totalBytes > HARD_SIZE_LIMIT_BYTES) {
         setLocalStatus("error");
         setSaveStatus("error");
         return;
@@ -56,49 +65,64 @@ export function useNote(id: string) {
 
       const seq = ++saveSeqRef.current;
 
-      try {
-        setLocalStatus("saving");
-        setSaveStatus("saving");
+      setLocalStatus("saving");
+      setSaveStatus("saving");
 
-        const updated: Note = {
-          ...base,
-          title: currentTitle.trim() || "Untitled note",
-          content: currentContent,
-          format: currentFormat,
-          updatedAt: new Date().toISOString(),
-        };
+      const saveOperation = (async () => {
+        try {
+          const updated: Note = {
+            ...base,
+            title: currentTitle.trim() || "Untitled note",
+            content: currentContent,
+            format: currentFormat,
+            updatedAt: new Date().toISOString(),
+          };
 
-        const repo = getNoteRepository();
-        await repo.saveNote(updated);
+          const repo = getNoteRepository();
+          await repo.saveNote(updated);
 
-        // Check if a newer save was initiated or note was switched
-        if (seq !== saveSeqRef.current || targetId !== activeIdRef.current) {
-          return;
+          // Check if a newer save was initiated or note was switched
+          if (seq !== saveSeqRef.current || targetId !== activeIdRef.current) {
+            return;
+          }
+
+          setNote(updated);
+          setCurrentNoteTitle(updated.title);
+          lastCommittedRef.current = {
+            title: updated.title,
+            content: updated.content,
+            format: updated.format ?? "plain-text-v1",
+          };
+
+          const finalStatus: SaveStatus = repo.isDurable ? "saved" : "error";
+          setLocalStatus(finalStatus);
+          setSaveStatus(finalStatus);
+
+          // Update in-memory reactive state
+          updateNoteInMemory(updated);
+        } catch (err) {
+          if (seq !== saveSeqRef.current || targetId !== activeIdRef.current) {
+            return;
+          }
+
+          // Privacy rule: Never log private note titles, content, or payloads.
+          // Only log generic diagnostic error names.
+          console.error("Storage transaction failed during note save:", {
+            error: err instanceof Error ? err.name : "StorageError",
+          });
+
+          // Retain unsaved edits intact in memory and update status to error
+          setLocalStatus("error");
+          setSaveStatus("error");
+        } finally {
+          if (seq === saveSeqRef.current) {
+            inFlightPromiseRef.current = null;
+          }
         }
+      })();
 
-        setNote(updated);
-        setCurrentNoteTitle(updated.title);
-
-        const finalStatus: SaveStatus = repo.isDurable ? "saved" : "error";
-        setLocalStatus(finalStatus);
-        setSaveStatus(finalStatus);
-
-        // Update in-memory reactive state
-        updateNoteInMemory(updated);
-      } catch (err) {
-        if (seq !== saveSeqRef.current || targetId !== activeIdRef.current) {
-          return;
-        }
-
-        // Privacy rule: Never log private note titles, content, or payloads
-        console.error("Storage transaction failed during note save:", {
-          error: err instanceof Error ? err.name : "StorageError",
-        });
-
-        // Retain unsaved edits intact in memory and update status to error
-        setLocalStatus("error");
-        setSaveStatus("error");
-      }
+      inFlightPromiseRef.current = saveOperation;
+      return saveOperation;
     },
     [setCurrentNoteTitle, setSaveStatus, updateNoteInMemory]
   );
@@ -109,13 +133,47 @@ export function useNote(id: string) {
     await performSave(t, c, f);
   }, [performSave]);
 
-  // Flush pending save immediately
-  const flushPendingSave = useCallback(() => {
+  // Flush pending save immediately, correctly handling both pending timers and in-flight saves
+  const flushPendingSave = useCallback(async (): Promise<void> => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = null;
-      const { title: t, content: c, format: f } = latestDataRef.current;
-      performSave(t, c, f);
+    }
+
+    // If a save is already in-flight:
+    if (inFlightPromiseRef.current) {
+      try {
+        await inFlightPromiseRef.current;
+      } catch {
+        // In-flight error is handled by performSave's own catch block
+      }
+
+      // Re-evaluate whether unsaved edits remain after the in-flight save committed
+      const latest = latestDataRef.current;
+      const committed = lastCommittedRef.current;
+      const stillHasUnsavedEdits =
+        !committed ||
+        committed.title !== latest.title.trim() ||
+        committed.content !== latest.content ||
+        committed.format !== latest.format;
+
+      if (stillHasUnsavedEdits && noteRef.current) {
+        return await performSave(latest.title, latest.content, latest.format);
+      }
+      return;
+    }
+
+    // No save in-flight, but unsaved edits exist:
+    const { title: t, content: c, format: f } = latestDataRef.current;
+    const committed = lastCommittedRef.current;
+    const hasUnsavedEdits =
+      !committed ||
+      committed.title !== t.trim() ||
+      committed.content !== c ||
+      committed.format !== f;
+
+    if (hasUnsavedEdits && noteRef.current) {
+      return await performSave(t, c, f);
     }
   }, [performSave]);
 
@@ -154,6 +212,11 @@ export function useNote(id: string) {
           setFormat(initialFormat);
           setCurrentNoteTitle(loaded.title);
           setActiveNoteId(loaded.id);
+          lastCommittedRef.current = {
+            title: loaded.title,
+            content: loaded.content,
+            format: initialFormat,
+          };
 
           const initialStatus: SaveStatus = repo.isDurable ? "saved" : "error";
           setLocalStatus(initialStatus);
@@ -196,8 +259,7 @@ export function useNote(id: string) {
     [performSave, setCurrentNoteTitle, setSaveStatus]
   );
 
-  // Debounced auto-save on rich content change
-  // Note: whenever content is edited in Phase 3 rich editor, format is updated to tiptap-json-v1
+  // Debounced auto-save on rich content change (format becomes tiptap-json-v1)
   const handleContentChange = useCallback(
     (newContent: string) => {
       setContent(newContent);
@@ -214,6 +276,23 @@ export function useNote(id: string) {
     [performSave, setSaveStatus]
   );
 
+  // Debounced auto-save on plain-text fallback content change (format remains plain-text-v1)
+  const handleFallbackContentChange = useCallback(
+    (newPlainText: string) => {
+      setContent(newPlainText);
+      setFormat("plain-text-v1");
+      setLocalStatus("unsaved");
+      setSaveStatus("unsaved");
+
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(() => {
+        saveTimeoutRef.current = null;
+        performSave(latestDataRef.current.title, newPlainText, "plain-text-v1");
+      }, 400);
+    },
+    [performSave, setSaveStatus]
+  );
+
   // Lifecycle flushing: component unmount
   useEffect(() => {
     return () => {
@@ -222,6 +301,10 @@ export function useNote(id: string) {
   }, [flushPendingSave]);
 
   // Lifecycle flushing: visibilitychange & pagehide
+  // Browser limitation note: Modern browsers may terminate asynchronous IndexedDB transactions if
+  // the page process is killed abruptly during tab close before the event loop commits. The application
+  // synchronously flushes pending debounced state and dispatches the write on pagehide/visibilitychange,
+  // and never falsely reports data as saved before the transaction resolves.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (typeof document !== "undefined" && document.visibilityState === "hidden") {
@@ -269,6 +352,7 @@ export function useNote(id: string) {
     flushPendingSave,
     handleTitleChange,
     handleContentChange,
+    handleFallbackContentChange,
     deleteNote: deleteThisNote,
     toggleFavorite,
   };

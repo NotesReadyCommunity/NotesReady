@@ -9,43 +9,54 @@ interface Props {
   children: ReactNode;
   fallbackContent: string;
   format?: NoteContentFormat;
-  onContentChange?: (content: string) => void;
+  onFallbackContentChange?: (plainText: string) => void;
 }
 
 interface State {
   hasError: boolean;
   errorName: string;
+  localText: string | null;
 }
 
 export class EditorErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
     errorName: "",
+    localText: null,
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): Partial<State> {
     return {
       hasError: true,
-      errorName: error.name || "Error",
+      errorName: error.name || "EditorError",
     };
   }
 
   public componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
     // Privacy Rule: Never log note titles, bodies, pasted content, or sensitive user data.
-    // Log strictly error names and generic diagnostic messages.
-    console.error("EditorErrorBoundary caught error:", {
-      name: error.name,
-      message: error.message,
+    // Explicitly exclude error.message as it may embed input snippets.
+    // Log strictly a generic diagnostic message and safe error name.
+    console.error("EditorErrorBoundary caught an unexpected editor error:", {
+      name: error?.name || "EditorError",
     });
   }
 
   private handleReset = () => {
-    this.setState({ hasError: false, errorName: "" });
+    this.setState({ hasError: false, errorName: "", localText: null });
+  };
+
+  private handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value;
+    this.setState({ localText: newText });
+    this.props.onFallbackContentChange?.(newText);
   };
 
   public render() {
     if (this.state.hasError) {
-      const plainText = extractPlainText(this.props.fallbackContent, this.props.format);
+      const displayText =
+        this.state.localText !== null
+          ? this.state.localText
+          : extractPlainText(this.props.fallbackContent, this.props.format);
 
       return (
         <div className="space-y-4 my-4 animate-in fade-in" role="alert">
@@ -53,7 +64,7 @@ export class EditorErrorBoundary extends Component<Props, State> {
             <div className="flex items-center gap-2">
               <AlertTriangle size={16} className="shrink-0" />
               <span>
-                Rich editor encountered an issue ({this.state.errorName}). Switched to safe plain-text mode.
+                Rich editor encountered an unexpected issue ({this.state.errorName}). Switched to safe plain-text mode.
                 Your content is fully preserved.
               </span>
             </div>
@@ -68,8 +79,8 @@ export class EditorErrorBoundary extends Component<Props, State> {
           </div>
 
           <textarea
-            value={plainText}
-            onChange={(e) => this.props.onContentChange?.(e.target.value)}
+            value={displayText}
+            onChange={this.handleTextChange}
             aria-label="Plain Text Fallback Content"
             placeholder="Write note content..."
             className="w-full min-h-[350px] p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-0)] text-[var(--text-primary)] text-base font-sans outline-none focus:border-[var(--brand-ember,#E85D3F)] resize-y"

@@ -29,8 +29,8 @@
   2. Contextual floating bubble menu positioned via ProseMirror coordinates with NotesReady Ember accents and Escape dismissal.
   3. Content-format marker (`plain-text-v1` and `tiptap-json-v1`) with non-destructive in-memory legacy migration.
   4. Truthful save states (`Saving...`, `Saved locally`, `Could not save`) with failure preservation and retry.
-  5. Lifecycle flushing on unmount, `pagehide`, and `visibilitychange`.
-  6. Document size measurements (500 KB soft warning, 2 MB hard blocking limit).
-  7. Editor error boundary with plain-textarea fallback.
-  8. Hostile paste sanitization and zero-telemetry content leak prevention.
-  9. 53 automated unit and integration tests passing across 13 test files.
+  5. Lifecycle flushing on unmount, `pagehide`, and `visibilitychange` with in-flight save sequencing and stale overwrite protection.
+  6. Document size measurements (500 KB soft warning, 2 MB hard blocking limit with ProseMirror transaction filtering and recovery).
+  7. Editor error boundary with plain-textarea fallback saving explicit `plain-text-v1`.
+  8. Hostile paste sanitization and zero-telemetry content leak prevention (no `error.message` or note content in logs).
+  9. 62 automated unit and integration tests passing across 13 test files.

@@ -9,6 +9,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { NoteContentFormat } from "@/core/models/note";
 import { convertPlainTextToTiptapDoc } from "@/core/utils/content";
 import { checkContentSize, ContentSizeCheck } from "@/core/utils/limits";
+import { createSizeLimitExtension } from "./sizeLimitExtension";
 import { EditorBubbleMenu } from "./EditorBubbleMenu";
 import { EditorSizeWarning } from "./EditorSizeWarning";
 
@@ -26,6 +27,7 @@ interface RichEditorProps {
 export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(
   ({ content, format, onContentChange, disabled = false }, ref) => {
     const [sizeCheck, setSizeCheck] = useState<ContentSizeCheck>(() => checkContentSize(content));
+    const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
     // Convert initial content in-memory without mutating persistence layer
     const initialContent = useMemo(() => {
@@ -44,6 +46,16 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(
       // Legacy plain-text-v1 or undefined format: in-memory conversion only
       return convertPlainTextToTiptapDoc(content);
     }, [content, format]);
+
+    // Extension enforcing hard size limit at the ProseMirror transaction level.
+    // Prevents edits/pastes that would exceed 2 MB from ever entering the document,
+    // safely preserving the last valid document intact while still permitting
+    // deletions (reductions) so the user can easily recover.
+    const sizeLimitExtension = useMemo(() => {
+      return createSizeLimitExtension({
+        onBlockedChange: setIsBlocked,
+      });
+    }, []);
 
     const editor = useEditor({
       extensions: [
@@ -64,6 +76,7 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(
           placeholder: "Start writing immediately...",
           emptyEditorClass: "is-editor-empty",
         }),
+        sizeLimitExtension,
       ],
       content: initialContent,
       editable: !disabled,
@@ -82,12 +95,11 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(
         const check = checkContentSize(jsonString);
         setSizeCheck(check);
 
-        // Hard limit protection: block persistence if 2 MB limit is exceeded
-        if (check.isExceeded) {
-          return;
+        // If document is within allowed limit, persist changes
+        if (!check.isExceeded) {
+          setIsBlocked(false);
+          onContentChange(jsonString);
         }
-
-        onContentChange(jsonString);
       },
     });
 
@@ -113,7 +125,7 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(
 
     return (
       <div className="relative notesready-editor-wrapper">
-        <EditorSizeWarning check={sizeCheck} />
+        <EditorSizeWarning check={sizeCheck} isBlocked={isBlocked} />
         <EditorBubbleMenu editor={editor} />
         <EditorContent editor={editor} />
       </div>

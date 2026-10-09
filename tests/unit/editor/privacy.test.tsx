@@ -37,4 +37,37 @@ describe("Privacy & Telemetry Audit (Zero Content in Logs)", () => {
 
     errorSpy.mockRestore();
   });
+
+  it("never logs error.message when it embeds sensitive document text", () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const sensitiveEmbeddedSnippet = "CONFIDENTIAL_PATIENT_RECORDS_SNIPPET_XYZ";
+
+    const SensitiveMessageEditor = () => {
+      // Simulate ProseMirror or parser error that incorporates the offending text snippet into error.message
+      const err = new Error(`Syntax error parsing document node containing '${sensitiveEmbeddedSnippet}'`);
+      err.name = "ProseMirrorParseError";
+      throw err;
+    };
+
+    render(
+      <EditorErrorBoundary
+        fallbackContent="Safe note content"
+        format="plain-text-v1"
+      >
+        <SensitiveMessageEditor />
+      </EditorErrorBoundary>
+    );
+
+    expect(errorSpy).toHaveBeenCalled();
+
+    for (const call of errorSpy.mock.calls) {
+      const callString = JSON.stringify(call);
+      expect(callString).not.toContain(sensitiveEmbeddedSnippet);
+      expect(callString).not.toContain("Syntax error parsing document node");
+      // Safe error name is logged
+      expect(callString).toContain("ProseMirrorParseError");
+    }
+
+    errorSpy.mockRestore();
+  });
 });

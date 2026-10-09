@@ -23,6 +23,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
     isNotFound,
     handleTitleChange,
     handleContentChange,
+    handleFallbackContentChange,
     deleteNote,
     toggleFavorite,
   } = useNote(noteId);
@@ -179,7 +180,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({ noteId }) => {
         <EditorErrorBoundary
           fallbackContent={content}
           format={format}
-          onContentChange={handleContentChange}
+          onFallbackContentChange={handleFallbackContentChange}
         >
           <RichEditor
             key={note.id}

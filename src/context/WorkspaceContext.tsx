@@ -65,7 +65,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       setNotes(allNotes);
       setRecentNotes(recents);
     } catch (err) {
-      console.error("Failed to load notes from storage", err);
+      console.error("Failed to load notes from storage:", {
+        error: err instanceof Error ? err.name : "StorageError",
+      });
       setIsStorageDurable(false);
       setStorageError("Failed to access local storage.");
       setSaveStatus("error");

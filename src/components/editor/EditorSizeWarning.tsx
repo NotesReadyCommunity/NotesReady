@@ -6,14 +6,18 @@ import { ContentSizeCheck } from "@/core/utils/limits";
 
 interface EditorSizeWarningProps {
   check: ContentSizeCheck;
+  isBlocked?: boolean;
 }
 
-export const EditorSizeWarning: React.FC<EditorSizeWarningProps> = ({ check }) => {
-  if (!check.isWarning && !check.isExceeded) {
+export const EditorSizeWarning: React.FC<EditorSizeWarningProps> = ({
+  check,
+  isBlocked = false,
+}) => {
+  if (!check.isWarning && !check.isExceeded && !isBlocked) {
     return null;
   }
 
-  if (check.isExceeded) {
+  if (isBlocked || check.isExceeded) {
     return (
       <div
         className="flex items-start gap-2.5 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-600 dark:text-red-400 my-3 animate-in fade-in"
@@ -22,10 +26,15 @@ export const EditorSizeWarning: React.FC<EditorSizeWarningProps> = ({ check }) =
       >
         <AlertOctagon size={16} className="shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="font-semibold">Maximum Note Size Limit Exceeded ({check.formattedSize})</p>
+          <p className="font-semibold">
+            {isBlocked
+              ? "Addition Blocked: Exceeds 2 MB Limit"
+              : `Maximum Note Size Limit Exceeded (${check.formattedSize})`}
+          </p>
           <p className="text-[11px] leading-relaxed opacity-90">
-            This note exceeds the 2 MB hard limit. Autosave and additional content input have been paused to prevent data loss.
-            Your current text is preserved in the editor—please copy or delete excess content to resume normal saving.
+            {isBlocked
+              ? "The typed or pasted content was blocked because it would exceed the 2 MB hard limit. Your existing content is fully preserved. Please delete or trim text before adding more."
+              : "This note exceeds the 2 MB hard limit. Additional content input is blocked to prevent data loss. Please trim or delete excess content to resume normal editing."}
           </p>
         </div>
       </div>
