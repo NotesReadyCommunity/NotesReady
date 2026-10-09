@@ -37,11 +37,18 @@
 - [x] Debounced autosave (400ms) with honest local save status
 - [x] Soft-deletion support and missing note error handling
 
-## Phase 3: Rich Editor
-- [ ] Tiptap modular editor integration
-- [ ] Block extensions: Headings (H1-H3), Checklists, Code blocks, Callouts, Quotes, Dividers
-- [ ] Keyboard shortcuts and Markdown shortcuts (`# `, `- [ ]`, `> `)
-- [ ] Contextual floating toolbar & bubble menu
+## Phase 3: Rich Editor — COMPLETE & COMMITTED LOCALLY
+- [x] Tiptap modular editor integration (Tiptap v3)
+- [x] Block extensions: Headings (H1-H3), Checklists, Code blocks, Quotes, Dividers, History
+- [x] Keyboard shortcuts and Markdown shortcuts (`# `, `- [ ]`, `> `)
+- [x] Contextual floating toolbar & bubble menu with NotesReady Ember active state
+- [x] Content-format marker (`plain-text-v1`, `tiptap-json-v1`) and in-memory non-destructive legacy migration
+- [x] Truthful autosave states (`Saving...`, `Saved locally`, `Could not save` with retry)
+- [x] Lifecycle flushing on unmount, `pagehide`, and `visibilitychange`
+- [x] Hostile paste sanitization and schema security
+- [x] Document size limits (500 KB soft warning, 2 MB hard blocking limit)
+- [x] Editor error boundary with plain-textarea fallback
+- [x] Zero note content in logs verification
 
 ## Phase 4: Persistence & Organization
 - [ ] PostgreSQL schema & migrations

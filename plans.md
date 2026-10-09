@@ -22,10 +22,15 @@
   6. Real reactive recent notes and favorites list in sidebar and workspace directory views.
   7. 25 automated unit and integration tests passing.
 
-## Upcoming Plan: Phase 3 — Rich Editor (Queued / Ready to Begin)
-- **Status**: QUEUED — DO NOT START UNTIL EXPLICITLY INSTRUCTED
-- **Scope**:
-  - Tiptap modular editor integration
-  - Block extensions: Headings, Checklists, Code blocks, Callouts, Quotes, Dividers
-  - Keyboard shortcuts and Markdown shortcuts
-  - Floating formatting toolbar and contextual menus
+## Phase 3 — Rich Editor (IMPLEMENTED & LOCALLY COMMITTED)
+- **Status**: IMPLEMENTED & LOCALLY COMMITTED (`5be9bbd`)
+- **Completed Deliverables**:
+  1. Tiptap v3 rich text editor with restricted schema (H1–H3, bold, italic, inline code, bullet/ordered lists, task lists, blockquotes, code blocks, horizontal dividers, history).
+  2. Contextual floating bubble menu positioned via ProseMirror coordinates with NotesReady Ember accents and Escape dismissal.
+  3. Content-format marker (`plain-text-v1` and `tiptap-json-v1`) with non-destructive in-memory legacy migration.
+  4. Truthful save states (`Saving...`, `Saved locally`, `Could not save`) with failure preservation and retry.
+  5. Lifecycle flushing on unmount, `pagehide`, and `visibilitychange`.
+  6. Document size measurements (500 KB soft warning, 2 MB hard blocking limit).
+  7. Editor error boundary with plain-textarea fallback.
+  8. Hostile paste sanitization and zero-telemetry content leak prevention.
+  9. 53 automated unit and integration tests passing across 13 test files.
