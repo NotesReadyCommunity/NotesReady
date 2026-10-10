@@ -107,5 +107,40 @@ describe("Note Domain Model & Validation", () => {
     };
     const sanitizedLegacy = sanitizeNote(rawLegacy);
     expect(sanitizedLegacy?.format).toBe("plain-text-v1");
+    expect(sanitizedLegacy?.notebookId).toBeNull();
+    expect(sanitizedLegacy?.tags).toEqual([]);
+    expect(sanitizedLegacy?.archivedAt).toBeNull();
+  });
+
+  it("validates and sanitizes Phase 4 organization fields", () => {
+    const note = createEmptyNote({
+      title: "Organized Note",
+      notebookId: "nb-1",
+      tags: ["design", "architecture"],
+    });
+
+    expect(note.notebookId).toBe("nb-1");
+    expect(note.tags).toEqual(["design", "architecture"]);
+    expect(note.archivedAt).toBeNull();
+    expect(isNote(note)).toBe(true);
+
+    const archivedNote = {
+      ...note,
+      archivedAt: "2026-10-09T10:00:00.000Z",
+    };
+    expect(isNote(archivedNote)).toBe(true);
+
+    // Invalid tag type rejected
+    expect(isNote({ ...note, tags: "not-an-array" })).toBe(false);
+    expect(isNote({ ...note, tags: [123] })).toBe(false);
+
+    // Invalid notebookId rejected
+    expect(isNote({ ...note, notebookId: 123 })).toBe(false);
+    expect(isNote({ ...note, notebookId: "   " })).toBe(false);
+
+    const sanitized = sanitizeNote(archivedNote);
+    expect(sanitized?.notebookId).toBe("nb-1");
+    expect(sanitized?.tags).toEqual(["design", "architecture"]);
+    expect(sanitized?.archivedAt).toBe("2026-10-09T10:00:00.000Z");
   });
 });

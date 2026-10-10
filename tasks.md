@@ -50,11 +50,17 @@
 - [x] Editor error boundary with plain-textarea fallback
 - [x] Zero note content in logs verification
 
-## Phase 4: Persistence & Organization
-- [ ] PostgreSQL schema & migrations
-- [ ] Notebooks, folders, and nested organization
-- [ ] Tags, favorites, archive, and trash with recovery
-- [ ] Resilient autosave with offline fallback
+## Phase 4: Persistence & Organization — IMPLEMENTED & AUDITED
+- [x] Database Architecture Decision (ADR-010: Native IndexedDB v2 local-first; PostgreSQL deferred to Phase 5/6)
+- [x] IndexedDB v2 schema migration (`notesready-db`, `notebookId` and `archivedAt` indexes on notes, dedicated `notebooks` object store)
+- [x] Notebooks domain entity, validation runtime guards, creation, renaming, and safe deletion (unassigns notes without deleting)
+- [x] Dynamic notebook view (`/app/notebooks/[id]`) with filtered notes and inline renaming
+- [x] Tags assignment, removal, and workspace-wide tag filtering on `/app/notes`
+- [x] Archive and unarchive lifecycle with dedicated `/app/archive` view
+- [x] Trash & recovery lifecycle (`/app/trash`): restore, permanent delete with confirmation, empty trash
+- [x] Trashed note protection: top warning banner, read-only controls, disabled autosave, and direct restore
+- [x] Sidebar integration: active Trash & Archive links with counts, dynamic notebooks with inline "+ Notebook" creation
+- [x] Full quality gates: 92/92 unit/integration tests passing (including IndexedDB v1-to-v2 upgrade suite), 0 type errors, 0 ESLint errors, clean production build
 
 ## Phase 5: Real-Time Collaboration
 - [ ] Standalone Hocuspocus WebSocket server

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Note, NoteContentFormat } from "@/core/models/note";
 import { getNoteRepository } from "@/core/storage";
 import { useWorkspace, SaveStatus } from "@/context/WorkspaceContext";
 import { HARD_SIZE_LIMIT_BYTES, getContentSizeBytes } from "@/core/utils/limits";
 
 export function useNote(id: string) {
+  const router = useRouter();
   const {
     setSaveStatus,
     setCurrentNoteTitle,
@@ -15,6 +17,10 @@ export function useNote(id: string) {
     setRetrySaveHandler,
     deleteNote: contextDelete,
     toggleFavorite: contextToggle,
+    restoreNote: contextRestore,
+    permanentlyDeleteNote: contextHardDelete,
+    archiveNote: contextArchive,
+    unarchiveNote: contextUnarchive,
   } = useWorkspace();
 
   const [note, setNote] = useState<Note | null>(null);
@@ -23,6 +29,7 @@ export function useNote(id: string) {
   const [format, setFormat] = useState<NoteContentFormat>("plain-text-v1");
   const [isLoading, setIsLoading] = useState(true);
   const [isNotFound, setIsNotFound] = useState(false);
+  const [isTrashed, setIsTrashed] = useState(false);
   const [status, setLocalStatus] = useState<SaveStatus>("saved");
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,6 +61,9 @@ export function useNote(id: string) {
       const base = noteRef.current;
       const targetId = activeIdRef.current;
       if (!base || base.id !== targetId) return;
+
+      // Trashed notes cannot be edited or autosaved
+      if (base.deletedAt !== null) return;
 
       // Check document hard size limit before saving
       const totalBytes = getContentSizeBytes(currentContent);
@@ -157,7 +167,7 @@ export function useNote(id: string) {
         committed.content !== latest.content ||
         committed.format !== latest.format;
 
-      if (stillHasUnsavedEdits && noteRef.current) {
+      if (stillHasUnsavedEdits && noteRef.current && noteRef.current.deletedAt === null) {
         return await performSave(latest.title, latest.content, latest.format);
       }
       return;
@@ -172,7 +182,7 @@ export function useNote(id: string) {
       committed.content !== c ||
       committed.format !== f;
 
-    if (hasUnsavedEdits && noteRef.current) {
+    if (hasUnsavedEdits && noteRef.current && noteRef.current.deletedAt === null) {
       return await performSave(t, c, f);
     }
   }, [performSave]);
@@ -190,6 +200,7 @@ export function useNote(id: string) {
     let isMounted = true;
     setIsLoading(true);
     setIsNotFound(false);
+    setIsTrashed(false);
 
     // Flush any pending save from previous note before loading new note
     flushPendingSave();
@@ -200,10 +211,26 @@ export function useNote(id: string) {
         const loaded = await repo.getNote(id);
         if (!isMounted) return;
 
-        if (!loaded || loaded.deletedAt !== null) {
+        if (!loaded) {
           setIsNotFound(true);
+          setIsTrashed(false);
           setNote(null);
+        } else if (loaded.deletedAt !== null) {
+          // Trashed note: user can view in read-only and restore
+          setIsNotFound(false);
+          setIsTrashed(true);
+          setNote(loaded);
+          setTitle(loaded.title);
+          setContent(loaded.content);
+          const initialFormat = loaded.format ?? "plain-text-v1";
+          setFormat(initialFormat);
+          setCurrentNoteTitle(loaded.title);
+          setActiveNoteId(loaded.id);
+          setLocalStatus("saved");
+          setSaveStatus("saved");
         } else {
+          setIsNotFound(false);
+          setIsTrashed(false);
           setNote(loaded);
           setTitle(loaded.title);
           setContent(loaded.content);
@@ -301,10 +328,6 @@ export function useNote(id: string) {
   }, [flushPendingSave]);
 
   // Lifecycle flushing: visibilitychange & pagehide
-  // Browser limitation note: Modern browsers may terminate asynchronous IndexedDB transactions if
-  // the page process is killed abruptly during tab close before the event loop commits. The application
-  // synchronously flushes pending debounced state and dispatches the write on pagehide/visibilitychange,
-  // and never falsely reports data as saved before the transaction resolves.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (typeof document !== "undefined" && document.visibilityState === "hidden") {
@@ -340,6 +363,57 @@ export function useNote(id: string) {
     }
   }, [contextToggle, id, note]);
 
+  // Phase 4 restore and permanent delete actions
+  const handleRestoreNote = useCallback(async () => {
+    await contextRestore(id);
+    setIsTrashed(false);
+    const repo = getNoteRepository();
+    const reloaded = await repo.getNote(id);
+    if (reloaded) {
+      setNote(reloaded);
+    }
+  }, [contextRestore, id]);
+
+  const handlePermanentDelete = useCallback(async () => {
+    await contextHardDelete(id);
+    router.push("/app/trash");
+  }, [contextHardDelete, id, router]);
+
+  const handleToggleArchive = useCallback(async () => {
+    if (!note) return;
+    if (note.archivedAt) {
+      await contextUnarchive(id);
+      setNote({ ...note, archivedAt: null });
+    } else {
+      await contextArchive(id);
+      setNote({ ...note, archivedAt: new Date().toISOString() });
+    }
+  }, [contextArchive, contextUnarchive, id, note]);
+
+  const setNotebookId = useCallback(
+    async (nbId: string | null) => {
+      if (!note) return;
+      const repo = getNoteRepository();
+      const updated = { ...note, notebookId: nbId, updatedAt: new Date().toISOString() };
+      await repo.saveNote(updated);
+      setNote(updated);
+      updateNoteInMemory(updated);
+    },
+    [note, updateNoteInMemory]
+  );
+
+  const setTags = useCallback(
+    async (newTags: string[]) => {
+      if (!note) return;
+      const repo = getNoteRepository();
+      const updated = { ...note, tags: newTags, updatedAt: new Date().toISOString() };
+      await repo.saveNote(updated);
+      setNote(updated);
+      updateNoteInMemory(updated);
+    },
+    [note, updateNoteInMemory]
+  );
+
   return {
     note,
     title,
@@ -347,6 +421,7 @@ export function useNote(id: string) {
     format,
     isLoading,
     isNotFound,
+    isTrashed,
     status,
     retrySave,
     flushPendingSave,
@@ -355,5 +430,10 @@ export function useNote(id: string) {
     handleFallbackContentChange,
     deleteNote: deleteThisNote,
     toggleFavorite,
+    restoreNote: handleRestoreNote,
+    permanentlyDeleteNote: handlePermanentDelete,
+    toggleArchive: handleToggleArchive,
+    setNotebookId,
+    setTags,
   };
 }

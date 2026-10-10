@@ -34,3 +34,16 @@
   7. Editor error boundary with plain-textarea fallback saving explicit `plain-text-v1`.
   8. Hostile paste sanitization and zero-telemetry content leak prevention (no `error.message` or note content in logs).
   9. 62 automated unit and integration tests passing across 13 test files.
+
+## Phase 4 — Persistence & Organization (IMPLEMENTED & AUDITED)
+- **Status**: IMPLEMENTED & AUDITED
+- **Completed Deliverables**:
+  1. Non-destructive IndexedDB v2 upgrade (`notesready-db`, `DB_VERSION = 2`) with `notebookId` and `archivedAt` indexes on notes, plus a dedicated `notebooks` object store.
+  2. Complete Trash & Recovery workflow: soft deletion with `deletedAt`, dedicated `/app/trash` route, restore notes, permanent delete with confirmation, and empty trash.
+  3. Trashed note protection: reading trashed notes via direct URL renders a top Trashed Note Banner with read-only controls, disabled autosave, and direct Restore / Delete Forever actions.
+  4. Notebooks organization: decoupled `Notebook` domain entity and runtime validators, create notebook, rename notebook, delete notebook with safe note preservation (`notebookId` cleared to `null` to prevent data loss).
+  5. Dedicated dynamic notebook view `/app/notebooks/[id]` displaying notebook title, inline renaming, safe deletion, and note cards filtered by notebook.
+  6. Tags system: flexible array of tags (`tags?: string[]`) on notes, inline tag creation/removal in editor, and tag filter pills on `/app/notes`.
+  7. Archive workflow: archive notes to declutter workspace, dedicated `/app/archive` view with restore/unarchive action.
+  8. Sidebar integration: active working links for `/app/trash` (with count badge), `/app/archive` (with count badge), dynamic notebooks with inline "+ Notebook" creation, and honest "Soon" badges on planned Quick Search & Settings.
+  9. 92 automated tests passing across 19 test files (including populated IndexedDB v1-to-v2 migration test suite), zero TypeScript errors (`tsc --noEmit`), zero ESLint errors, and clean production build (`next build`).

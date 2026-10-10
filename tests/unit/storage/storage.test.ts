@@ -3,6 +3,7 @@ import { MemoryNoteRepository } from "@/core/storage/memory";
 import { IndexedDBNoteRepository } from "@/core/storage/indexeddb";
 import { getNoteRepository, setNoteRepository, getStorageError } from "@/core/storage";
 import { createEmptyNote } from "@/core/models/note";
+import { createEmptyNotebook } from "@/core/models/notebook";
 
 describe("MemoryNoteRepository", () => {
   let repo: MemoryNoteRepository;
@@ -70,6 +71,102 @@ describe("MemoryNoteRepository", () => {
     const recent = await repo.listRecentNotes(3);
     expect(recent.length).toBe(3);
     expect(recent[0].title).toBe("Note 4");
+  });
+
+  it("lists trashed notes and restores a soft-deleted note", async () => {
+    const note1 = createEmptyNote({ title: "Note to Keep" });
+    const note2 = createEmptyNote({ title: "Note to Trash" });
+    await repo.saveNote(note1);
+    await repo.saveNote(note2);
+
+    await repo.deleteNote(note2.id);
+
+    const active = await repo.listNotes();
+    expect(active.length).toBe(1);
+    expect(active[0].id).toBe(note1.id);
+
+    const trashed = await repo.listTrashedNotes();
+    expect(trashed.length).toBe(1);
+    expect(trashed[0].id).toBe(note2.id);
+
+    // Restore note2
+    await repo.restoreNote(note2.id);
+    const restoredActive = await repo.listNotes();
+    expect(restoredActive.length).toBe(2);
+
+    const trashedAfter = await repo.listTrashedNotes();
+    expect(trashedAfter.length).toBe(0);
+  });
+
+  it("archives notes, excludes them from active list, and unarchives them", async () => {
+    const note = createEmptyNote({ title: "Reference Document" });
+    await repo.saveNote(note);
+
+    await repo.archiveNote(note.id);
+
+    // Excluded from standard active list
+    const active = await repo.listNotes();
+    expect(active.length).toBe(0);
+
+    // Present in archive list
+    const archived = await repo.listArchivedNotes();
+    expect(archived.length).toBe(1);
+    expect(archived[0].id).toBe(note.id);
+    expect(archived[0].archivedAt).not.toBeNull();
+
+    // Unarchive
+    await repo.unarchiveNote(note.id);
+    const activeAfter = await repo.listNotes();
+    expect(activeAfter.length).toBe(1);
+    expect(activeAfter[0].archivedAt).toBeNull();
+  });
+
+  it("filters notes by notebook and tag", async () => {
+    const note1 = createEmptyNote({
+      title: "Design Note",
+      notebookId: "nb-design",
+      tags: ["ui", "tokens"],
+    });
+    const note2 = createEmptyNote({
+      title: "Backend Note",
+      notebookId: "nb-backend",
+      tags: ["db", "tokens"],
+    });
+    await repo.saveNote(note1);
+    await repo.saveNote(note2);
+
+    const designNotes = await repo.listNotesByNotebook("nb-design");
+    expect(designNotes.length).toBe(1);
+    expect(designNotes[0].id).toBe(note1.id);
+
+    const tokenNotes = await repo.listNotesByTag("tokens");
+    expect(tokenNotes.length).toBe(2);
+
+    const uiNotes = await repo.listNotesByTag("UI"); // case-insensitive
+    expect(uiNotes.length).toBe(1);
+    expect(uiNotes[0].id).toBe(note1.id);
+  });
+
+  it("handles notebook lifecycle and unassigns affected notes on deletion", async () => {
+    const nb = createEmptyNotebook({ name: "Work Projects" });
+    await repo.saveNotebook(nb);
+
+    const list = await repo.listNotebooks();
+    expect(list.length).toBe(1);
+    expect(list[0].name).toBe("Work Projects");
+
+    const note = createEmptyNote({ title: "Project Plan", notebookId: nb.id });
+    await repo.saveNote(note);
+
+    // Delete notebook: notebook deleted, note preserved with notebookId = null
+    await repo.deleteNotebook(nb.id);
+
+    const listAfter = await repo.listNotebooks();
+    expect(listAfter.length).toBe(0);
+
+    const noteAfter = await repo.getNote(note.id);
+    expect(noteAfter).not.toBeNull();
+    expect(noteAfter?.notebookId).toBeNull();
   });
 });
 
@@ -147,8 +244,10 @@ describe("Storage Honesty & IndexedDB Durability", () => {
       resolved = true;
     });
 
-    // Wait for DB open and store.put
-    await new Promise((r) => setTimeout(r, 10));
+    // Wait until transaction and complete handler are initialized
+    for (let i = 0; i < 100 && !completeHandler; i++) {
+      await new Promise((r) => setTimeout(r, 10));
+    }
     expect(putCalled).toBe(true);
     // Promise should NOT be resolved before transaction oncomplete
     expect(resolved).toBe(false);
@@ -205,7 +304,11 @@ describe("Storage Honesty & IndexedDB Durability", () => {
 
     const savePromise = repo.saveNote(note);
 
-    await new Promise((r) => setTimeout(r, 10));
+    // Wait until transaction and abort handler are initialized
+    for (let i = 0; i < 100 && !abortHandler; i++) {
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    expect(abortHandler).not.toBeNull();
     if (abortHandler) {
       (abortHandler as () => void)();
     }
