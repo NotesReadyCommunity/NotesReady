@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: NotesReady Documentation & Architecture
+    url: https://github.com/NotesReadyCommunity/NotesReady/blob/main/architecture.md
+    about: Review our technical architecture and decision records before proposing major changes.
