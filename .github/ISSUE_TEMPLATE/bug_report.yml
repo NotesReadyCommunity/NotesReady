@@ -1,0 +1,65 @@
+name: "Bug Report"
+description: "File a structured bug report for NotesReady"
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please do not include private personal notes or sensitive credentials in your report.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: A concise description of the problem.
+      placeholder: "e.g., Autosave indicator does not reset after network restoration"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Open an existing note in /app/notes
+        2. Disconnect internet connection
+        3. Make an edit to the note body
+        4. Observe save status indicator
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen under correct operation.
+      placeholder: "e.g., Note status should reflect 'Saved locally' with no errors."
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happens.
+      placeholder: "e.g., Save status displays 'Could not save' even though local write committed."
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Operating Environment
+      options:
+        - "Chrome / Chromium (Desktop)"
+        - "Firefox (Desktop)"
+        - "Safari (macOS / iOS)"
+        - "Edge (Desktop)"
+        - "Mobile Browser (Android / iOS)"
+        - "Node / Vitest Test Environment"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy-confirmation
+    attributes:
+      label: Privacy Confirmation
+      options:
+        - label: "I confirm this report contains NO private note contents, passwords, or personal identifying information."
+          required: true

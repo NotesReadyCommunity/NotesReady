@@ -1,0 +1,42 @@
+name: "Feature Proposal"
+description: "Propose an architectural improvement or new feature for NotesReady"
+title: "[Proposal]: "
+labels: ["enhancement", "design-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature proposals must align with the NotesReady North Star: *Simple enough to start instantly. Powerful enough to grow with you.*
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What user problem or architectural limitation does this proposal address?
+      placeholder: "e.g., Knowledge workers need a frictionless way to..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Detailed description of the feature or architectural change.
+      placeholder: "Describe the UX, domain models, and workflow..."
+    validations:
+      required: true
+  - type: textarea
+    id: architecture-impact
+    attributes:
+      label: Architectural & Security Impact
+      description: Does this affect local persistence, server RLS, document schemas, or offline resilience?
+      placeholder: "e.g., Requires adding an index to IndexedDB / Supabase..."
+    validations:
+      required: false
+  - type: checkboxes
+    id: alignment
+    attributes:
+      label: Design & Brand Alignment
+      options:
+        - label: "This proposal respects the Concept 04 monochrome logo invariant and NotesReady Ember 85-95% neutral ratio."
+          required: true
+        - label: "This proposal adheres to the Real Product UI Rule (no simulated or unbuilt mock features)."
+          required: true
