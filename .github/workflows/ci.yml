@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Verify whitespace and formatting
-        run: git diff --check HEAD~1 || true
+        run: git diff --check || true
 
       - name: Run automated test suite
         run: npm test
