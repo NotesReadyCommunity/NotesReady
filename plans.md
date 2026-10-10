@@ -46,4 +46,4 @@
   6. Tags system: flexible array of tags (`tags?: string[]`) on notes, inline tag creation/removal in editor, and tag filter pills on `/app/notes`.
   7. Archive workflow: archive notes to declutter workspace, dedicated `/app/archive` view with restore/unarchive action.
   8. Sidebar integration: active working links for `/app/trash` (with count badge), `/app/archive` (with count badge), dynamic notebooks with inline "+ Notebook" creation, and honest "Soon" badges on planned Quick Search & Settings.
-  9. 91 automated tests passing across 18 test files, zero TypeScript errors (`tsc --noEmit`), zero ESLint errors, and clean production build (`next build`).
+  9. 92 automated tests passing across 19 test files (including populated IndexedDB v1-to-v2 migration test suite), zero TypeScript errors (`tsc --noEmit`), zero ESLint errors, and clean production build (`next build`).

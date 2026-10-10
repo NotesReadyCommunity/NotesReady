@@ -1,8 +1,8 @@
 import { Note } from "../models/note";
 import { Notebook } from "../models/notebook";
 import { NoteRepository } from "./types";
-import { isNote } from "../validation/note";
-import { isNotebook } from "../validation/notebook";
+import { isNote, sanitizeNote } from "../validation/note";
+import { isNotebook, sanitizeNotebook } from "../validation/notebook";
 
 const DB_NAME = "notesready-db";
 const DB_VERSION = 2;
@@ -76,11 +76,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
 
         req.onsuccess = () => {
           const result = req.result;
-          if (isNote(result)) {
-            resolve(result);
-          } else {
-            resolve(null);
-          }
+          const sanitized = sanitizeNote(result);
+          resolve(sanitized);
         };
         req.onerror = () => reject(req.error || new Error("Failed to read note from IndexedDB"));
       });
@@ -117,7 +114,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
         req.onsuccess = () => {
           const results: unknown[] = req.result || [];
           const validNotes = results
-            .filter(isNote)
+            .map(sanitizeNote)
+            .filter((n): n is Note => n !== null)
             .filter((n) => n.deletedAt === null && (!n.archivedAt || n.archivedAt === null))
             .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
           resolve(validNotes);
@@ -182,7 +180,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
         req.onsuccess = () => {
           const results: unknown[] = req.result || [];
           const trashed = results
-            .filter(isNote)
+            .map(sanitizeNote)
+            .filter((n): n is Note => n !== null)
             .filter((n) => n.deletedAt !== null)
             .sort((a, b) => (b.deletedAt ?? "").localeCompare(a.deletedAt ?? ""));
           resolve(trashed);
@@ -229,7 +228,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
         req.onsuccess = () => {
           const results: unknown[] = req.result || [];
           const archived = results
-            .filter(isNote)
+            .map(sanitizeNote)
+            .filter((n): n is Note => n !== null)
             .filter((n) => n.deletedAt === null && n.archivedAt !== null)
             .sort((a, b) => (b.archivedAt ?? "").localeCompare(a.archivedAt ?? ""));
           resolve(archived);
@@ -252,7 +252,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
         req.onsuccess = () => {
           const results: unknown[] = req.result || [];
           const notebookNotes = results
-            .filter(isNote)
+            .map(sanitizeNote)
+            .filter((n): n is Note => n !== null)
             .filter(
               (n) =>
                 n.deletedAt === null &&
@@ -281,7 +282,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
         req.onsuccess = () => {
           const results: unknown[] = req.result || [];
           const taggedNotes = results
-            .filter(isNote)
+            .map(sanitizeNote)
+            .filter((n): n is Note => n !== null)
             .filter(
               (n) =>
                 n.deletedAt === null &&
@@ -310,11 +312,8 @@ export class IndexedDBNoteRepository implements NoteRepository {
 
         req.onsuccess = () => {
           const result = req.result;
-          if (isNotebook(result)) {
-            resolve(result);
-          } else {
-            resolve(null);
-          }
+          const sanitized = sanitizeNotebook(result);
+          resolve(sanitized);
         };
         req.onerror = () => reject(req.error || new Error("Failed to read notebook from IndexedDB"));
       });
@@ -350,7 +349,10 @@ export class IndexedDBNoteRepository implements NoteRepository {
 
         req.onsuccess = () => {
           const results: unknown[] = req.result || [];
-          const valid = results.filter(isNotebook).sort((a, b) => a.name.localeCompare(b.name));
+          const valid = results
+            .map(sanitizeNotebook)
+            .filter((nb): nb is Notebook => nb !== null)
+            .sort((a, b) => a.name.localeCompare(b.name));
           resolve(valid);
         };
         req.onerror = () => reject(req.error || new Error("Failed to list notebooks from IndexedDB"));

@@ -60,7 +60,7 @@
 - [x] Trash & recovery lifecycle (`/app/trash`): restore, permanent delete with confirmation, empty trash
 - [x] Trashed note protection: top warning banner, read-only controls, disabled autosave, and direct restore
 - [x] Sidebar integration: active Trash & Archive links with counts, dynamic notebooks with inline "+ Notebook" creation
-- [x] Full quality gates: 91/91 unit/integration tests passing, 0 type errors, 0 ESLint errors, clean production build
+- [x] Full quality gates: 92/92 unit/integration tests passing (including IndexedDB v1-to-v2 upgrade suite), 0 type errors, 0 ESLint errors, clean production build
 
 ## Phase 5: Real-Time Collaboration
 - [ ] Standalone Hocuspocus WebSocket server
